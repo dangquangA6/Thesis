@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test CRUD Firebase Realtime Database</title>
+    <style>
+        body {text-align: center;}
+        #enterDetails {float: left; width: 50%;  background-color: rgb(0, 0, 0); color: floralwhite;}
+        #findDetails {float: left; width: 50%; background-color: rgb(253, 253, 253); color: darkslategray;}
+        input {width: 120px;}
+    </style>
+</head>
+<body>
+    <div id="enterDetails">
+        <h1>Enter details</h1>
+
+        <h4>ID</h4> 
+        <input id="enterID" type="text"> 
+
+        <h4>Name</h4> 
+        <input id="enterName" type="text"> 
+
+        <h4>Location</h4> 
+        <input id="enterLocation" type="text"> 
+
+        <h4>Packaging By</h4> 
+        <input id="enterPackagingBy" type="text"> 
+
+        <h4>Packaging Date</h4> 
+        <input id="enterPackagingDate" type="datetime-local"> <br><br>
+        
+        <button id="insert">INSERT</button> 
+        <button id="update">UPDATE</button>
+        <br><br>
+    </div>
+
+    <div id="findDetails">
+        <h1>Find Product by ID</h1>       
+        <input id="findID" type="text"> <br><br>
+        <button id="find">FIND</button>
+        <button id="remove">REMOVE</button>
+        <h3 id="findName" type="text"></h3>
+        <h3 id="findLocation" type="text"></h3>
+        <h3 id="findPackagingBy" type="text"></h3>
+        <h3 id="findPackagingDate" type="text"></h3>
+        <br><br>
+    </div>
+    
+
+    <script type="module">
+
+        //THIS IS WHERE YOU PASTE THE CODE TO CONNECT TO YOUR OWN DATABASE
+        //Copy and paste the CDN bit of code from your app that you created on Firebase.
+        //The script tag above is already there, so careful not to have duplicate script tags.
+        //After you've copied and pasted, just delete the unnecessary script tags.
+        // Import the functions you need from the SDKs you need
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.12.1/firebase-app.js";
+        import { getAnalytics } from "https://www.gstatic.com/firebasejs/9.12.1/firebase-analytics.js";
+        // TODO: Add SDKs for Firebase products that you want to use
+        // https://firebase.google.com/docs/web/setup#available-libraries
+
+        // Your web app's Firebase configuration
+        // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+        const firebaseConfig = {
+        apiKey: "AIzaSyCgqSRvngzAlWRJzjZelHeesiziw9kUe8Q",
+        authDomain: "thesis-sem1-2223.firebaseapp.com",
+        databaseURL: "https://thesis-sem1-2223-default-rtdb.asia-southeast1.firebasedatabase.app",
+        projectId: "thesis-sem1-2223",
+        storageBucket: "thesis-sem1-2223.appspot.com",
+        messagingSenderId: "804367002617",
+        appId: "1:804367002617:web:209673f14c9fd105d02b28",
+        measurementId: "G-CMQJ29H7Z9"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const analytics = getAnalytics(app); 
+   
+
+        import {getDatabase, ref, get, set, child, update, remove}
+        from "https://www.gstatic.com/firebasejs/9.12.1/firebase-database.js"
+        //Copy and Paste the URL from near the top of the CDN you pasted in from firebase
+        // (the one where you imported "initializeApp" from),
+        //but change "firebase-app" to "firebase-database"
+        
+
+        const db = getDatabase();
+
+        var enterID = document.querySelector("#enterID");
+        var enterName = document.querySelector("#enterName");
+        var enterLocation = document.querySelector("#enterLocation");
+        var enterPackagingBy = document.querySelector("#enterPackagingBy");
+        var enterPackagingDate = document.querySelector("#enterPackagingDate");
+
+        var findID = document.querySelector("#findID");
+        var findName = document.querySelector("#findName");
+        var findLocation = document.querySelector("#findLocation");
+        var findPackagingBy = document.querySelector("#findPackagingBy");
+        var findPackagingDate = document.querySelector("#findPackagingDate");
+      
+
+        var insertBtn = document.querySelector("#insert");
+        var updateBtn = document.querySelector("#update");
+        var removeBtn = document.querySelector("#remove");
+        var findBtn = document.querySelector("#find");
+
+        function InsertData() {
+            set(ref(db, "Products/"+ enterID.value),{
+                Name: enterName.value,
+                ID: enterID.value,
+                Location: enterLocation.value,
+                PackagingBy: enterPackagingBy.value,
+                PackagingDate: enterPackagingDate.value
+            })
+            .then(()=>{
+                alert("Data added successfully");
+            })
+            .catch((error)=>{
+                alert(error);
+            });
+        }
+
+        function FindData() {
+            const dbref = ref(db);
+
+            get(child(dbref, "Products/" + findID.value))
+            .then((snapshot)=>{
+                if(snapshot.exists()){
+                    findName.innerHTML = "Name: " + snapshot.val().Name;
+                    findLocation.innerHTML = "Location: " + snapshot.val().Location;
+                    findPackagingBy.innerHTML = "Packaging By: " + snapshot.val().PackagingBy;
+                    findPackagingDate.innerHTML = "Packaging Date: " + snapshot.val().PackagingDate;
+                } else {
+                    alert("No data found");
+                }
+            })
+            .catch((error)=>{
+                alert(error)
+            })
+            
+        }
+
+        function UpdateData(){
+            update(ref(db, "Products/"+ enterID.value),{
+                Name: enterName.value,
+                ID: enterID.value,
+                Location: enterLocation.value,
+                PackagingBy: enterPackagingBy.value,
+                PackagingDate: enterPackagingDate.value
+            })
+            .then(()=>{
+                alert("Data updated successfully");
+            })
+            .catch((error)=>{
+                alert(error);
+            });
+        }
+
+        function RemoveData(){
+            remove(ref(db, "Products/"+ findID.value))
+            .then(()=>{
+                alert("Data deleted successfully");
+            })
+            .catch((error)=>{
+                alert(error);
+            });
+        }
+
+        insertBtn.addEventListener('click', InsertData);
+        updateBtn.addEventListener('click', UpdateData);
+        removeBtn.addEventListener('click', RemoveData);
+        findBtn.addEventListener('click', FindData);
+
+      </script>
+</body>
+</html>
